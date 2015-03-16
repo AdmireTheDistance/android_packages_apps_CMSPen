@@ -104,8 +104,8 @@ public class SPenDetection extends Service {
             }
 			nm = (NotificationManager)getApplicationContext().getSystemService(NOTIFICATION_SERVICE);
 			notif= new Notification.Builder(this)
-				.setContentTitle(getString(R.string.app_name))
-				.setSmallIcon(R.drawable.ic_launcher)
+				.setContentTitle(getString(R.string.remove_pen))
+				.setSmallIcon(R.drawable.ic_pen)
 				.build();
 			notif.flags = Notification.FLAG_ONGOING_EVENT;
             screenLock = ((PowerManager) getSystemService(POWER_SERVICE)).newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "CMSPen");
