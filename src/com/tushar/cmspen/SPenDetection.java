@@ -32,6 +32,10 @@ import android.util.Log;
 import net.pocketmagic.android.eventinjector.Events;
 import net.pocketmagic.android.eventinjector.Events.InputDevice;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+
 public class SPenDetection extends Service {
 
     public static final int TOUCH_BUTTON_PRESS = 1;
@@ -56,6 +60,9 @@ public class SPenDetection extends Service {
     static WakeLock screenLock;
     static InputDevice idev;
     static EventHandler h;
+
+	static NotificationManager nm;
+	static Notification notif;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -95,6 +102,12 @@ public class SPenDetection extends Service {
                 stopSelf();
                 Log.d("CMSPen", e.getMessage());
             }
+			nm = (NotificationManager)getApplicationContext().getSystemService(NOTIFICATION_SERVICE);
+			notif= new Notification.Builder(this)
+				.setContentTitle(getString(R.string.app_name))
+				.setSmallIcon(R.drawable.ic_launcher)
+				.build();
+			notif.flags = Notification.FLAG_ONGOING_EVENT;
             screenLock = ((PowerManager) getSystemService(POWER_SERVICE)).newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "CMSPen");
             h = new EventHandler();
             new Thread() {
@@ -165,12 +178,16 @@ public class SPenDetection extends Service {
                             screenLock.acquire();
                             screenLock.release();
                             v.vibrate(VIBRATE_TIME);
+
+
+							nm.notify(1, notif);
                         }
                         if (idev.getSuccessfulPollingValue() == 0) {
                             i.putExtra("penInsert", true);
                             sendStickyBroadcast(i);
                             v.vibrate(VIBRATE_TIME);
                             inserted = true;
+							nm.cancel(1);
                         }
                     }
                     if (idev.getSuccessfulPollingType() == 0 && idev.getSuccessfulPollingCode() == 0 && idev.getSuccessfulPollingValue() == 0 && inserted) {
